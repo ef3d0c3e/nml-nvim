@@ -1,0 +1,1 @@
+require("nml-nvim").setup()
