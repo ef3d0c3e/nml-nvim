@@ -1,7 +1,6 @@
 local M = {}
 
 M.style_ns = vim.api.nvim_create_namespace("lsp_style")
-
 M.hl_cache = {}
 
 --- Get or create a highlight group for a given color
