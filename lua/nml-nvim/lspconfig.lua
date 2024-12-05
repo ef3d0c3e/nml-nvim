@@ -14,10 +14,10 @@ function M.setup_lsp()
 		}
 	end
 
-	local conceal = require("nml-nvim.conceal")
 	lspconfig.nmlls.setup {
 		on_attach = function(client, bufnr)
-			conceal.setup(client, bufnr)
+			require("nml-nvim.conceal").setup(client, bufnr)
+			require("nml-nvim.style").setup(client, bufnr)
 		end
 	}
 end

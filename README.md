@@ -1,7 +1,8 @@
 # Nvim integrations for the NML language server
 
 # Current support
- * `textDocument/coceal` allows the server to specify concealed blocks.
+ * `textDocument/conceal` allows the server to specify concealed ranges.
+ * `textDocument/style` allows the server to create custom highlights for ranges.
 
 # Installation
  * using `lazy`:

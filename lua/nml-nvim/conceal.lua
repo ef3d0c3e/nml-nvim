@@ -41,7 +41,7 @@ end
 
 -- Setup handler for the conceal extension provided by nmlls
 function M.setup(client, bufnr)
-	-- Request conddeal information from the LSP server on buffer changes
+	-- Request conceal information from the LSP server on buffer changes
 	vim.api.nvim_create_autocmd({"TextChanged", "TextChangedI"}, {
 		group = vim.api.nvim_create_augroup("LspConcealGroup", {clear = true}),
 		buffer = bufnr,
