@@ -1,36 +1,6 @@
 local M = {}
 
 M.style_ns = vim.api.nvim_create_namespace("lsp_style")
-M.hl_cache = {}
-
---- Get or create a highlight group for a given color
--- @param color The color in #RRGGBB format
--- @return Highlight group name
-local function get_or_create_hl_group(color, style)
-    if M.hl_cache[color] then
-        return M.hl_cache[color]
-    end
-
-    local hl_group = "LspStyle_" .. color:gsub("#", "")
-	if style ~= nil then
-		local group = { fg = color }
-		if style == "bold" then
-			group.bold = true
-		end
-		if style == "underlined" then
-			group.bold = true
-		end
-		if style == "italic" then
-			group.bold = true
-		end
-
-		vim.api.nvim_set_hl(0, hl_group, group)
-	else
-    	vim.api.nvim_set_hl(0, hl_group, { fg = color })
-	end
-    M.hl_cache[color] = hl_group
-    return hl_group
-end
 
 --- Apply a style based on the received StyleInfo
 -- @param bufnr The buffer number
@@ -44,16 +14,8 @@ local function apply_style(bufnr, style_info)
 
     local hl_group = nil
 
-    if style_info.style.Color then
-        -- Convert integer color to #RRGGBB
-        local color = string.format("#%06x", style_info.style.Color)
-        hl_group = get_or_create_hl_group(color)
-    elseif style_info.style.Style then
-        -- Use predefined styles (e.g., bold, italic)
-        hl_group = style_info.style.Style
-    elseif style_info.style.Full then
-        local color = string.format("#%06x", style_info.style.Full.color)
-        hl_group = get_or_create_hl_group(color, style_info.style.Full.style)
+    if style_info.style.group then
+        hl_group = string.format("NML_Style_%s", style_info.style.group)
     end
 
     -- Apply extmark with highlight
@@ -86,6 +48,13 @@ end
 
 -- Setup handler for the style extension provided by nmlls
 function M.setup(client, bufnr)
+	-- Setup highlights
+	vim.api.nvim_set_hl(0, "NML_Style_Bold", { link = "Bold" })
+	vim.api.nvim_set_hl(0, "NML_Style_Italic", { link = "Italic" })
+	vim.api.nvim_set_hl(0, "NML_Style_Underline", { link = "Underlined" })
+	local bg_code = vim.api.nvim_get_hl(0, { name = "CursorLine" })
+	vim.api.nvim_set_hl(0, "NML_Style_Code", { bg = bg_code.bg })
+
 	-- Request style information from the LSP server on buffer changes
 	vim.api.nvim_create_autocmd({"TextChanged", "TextChangedI"}, {
 		group = vim.api.nvim_create_augroup("LspStyleGroup", {clear = true}),
