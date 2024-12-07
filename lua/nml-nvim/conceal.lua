@@ -160,10 +160,12 @@ function M.setup(client, bufnr)
 
 	-- Request conceal information from the LSP server on buffer changes
 	local debounce_timer = vim.loop.new_timer()
+	local in_changed = false
 	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
 		group = vim.api.nvim_create_augroup("LspConcealGroup", { clear = true }),
 		buffer = bufnr,
 		callback = function()
+			in_changed = true
 			-- Throttle updates
 			if debounce_timer:is_active() then
 				debounce_timer:stop()
@@ -173,6 +175,7 @@ function M.setup(client, bufnr)
 				vim.schedule(function()
 					-- Request updated diagnostics
 					M.update_conceal(client, bufnr)
+					in_changed = false
 				end)
 			end)
 		end
@@ -181,6 +184,9 @@ function M.setup(client, bufnr)
 	-- Clear conceals and handle restoration on hover
 	vim.api.nvim_create_autocmd({ "CursorMoved", "CursorHold" }, {
 		callback = function()
+			if in_changed == true then
+				return
+			end
 			local bufnr = vim.api.nvim_get_current_buf()
 			local cursor = vim.api.nvim_win_get_cursor(0)
 			local current_line = cursor[1] - 1

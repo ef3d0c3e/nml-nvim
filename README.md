@@ -3,6 +3,7 @@
 # Current support
  * `textDocument/conceal` allows the server to specify concealed ranges.
  * `textDocument/style` allows the server to create custom highlights for ranges.
+ * `textDocument/codeRange` allows the server to specify a range for custom language highlighting.
 
 # Installation
  * using `lazy`:
