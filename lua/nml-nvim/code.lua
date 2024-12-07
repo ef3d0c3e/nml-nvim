@@ -5,6 +5,9 @@ M.code_ns = vim.api.nvim_create_namespace("lsp_code")
 local function get_language(language)
 	local map = {
 		["C++"] = "cpp",
+		["C#"] = "cs",
+		["Objective-C"] = "objc",
+		["Objective-C++"] = "objcpp",
 		["Plain Text"] = "text"
 	}
 
@@ -54,6 +57,35 @@ function M.clear_highlights(bufnr)
 	end)
 end
 
+function M.highlight_rectangle(bufnr, start_line, end_line)
+	-- Get the current window dimensions (width)
+	local width = vim.api.nvim_win_get_width(0)
+
+	-- Define the virtual text to use for highlighting (filling the entire width)
+	local highlight_text = string.rep(" ", width)  -- You can replace with any other character like "*" or "▏"
+
+	-- Add virtual text to each line in the specified range
+	for line = start_line, end_line do
+		-- Apply to the line's text
+    	vim.api.nvim_buf_add_highlight(bufnr, M.code_ns, "NML_Code", line, 0, -1)
+
+
+		-- Fill the 1 character gap
+		local line_length = vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]:len()
+		vim.api.nvim_buf_set_extmark(bufnr, M.code_ns, line, line_length, {
+			virt_text = {{" ", "NML_Code"}},  -- Highlight with a custom highlight group
+			virt_text_pos = "overlay",  -- Position the virtual text over the line (Region 2)
+		})
+
+		-- Apply the virtual text at the end of the line (positioned below the text)
+		vim.api.nvim_buf_set_extmark(bufnr, M.code_ns, line, 0, {
+			virt_text = {{highlight_text, "NML_Code"}},  -- Highlight with a custom highlight group
+			virt_text_pos = "eol",  -- Position the virtual text at the end of the line
+		})
+
+	end
+end
+
 function M.update_range(client, bufnr)
 	-- Request codeRange from the LSP server
 	client.request("textDocument/codeRange", { textDocument = { uri = vim.uri_from_bufnr(bufnr) } },
@@ -64,20 +96,24 @@ function M.update_range(client, bufnr)
 			end
 
 			M.clear_highlights(bufnr)
-			--vim.api.nvim_buf_clear_namespace(bufnr, M.code_ns, 0, -1)
+			vim.api.nvim_buf_clear_namespace(bufnr, M.code_ns, 0, -1)
 
 			-- Apply new highlights
 			for _, code_range in ipairs(result) do
 				M.highlight_language_range(bufnr, code_range.range, code_range.language)
+				M.highlight_rectangle(bufnr, code_range.range.start.line - 1, code_range.range['end'].line)
 			end
 		end, bufnr)
 end
 
 -- Setup handler for the code range extension provided by nmlls
 function M.setup(client, bufnr)
+	local bg_code = vim.api.nvim_get_hl(0, { name = "CursorLine" })
+	vim.api.nvim_set_hl(0, "NML_Code", { bg = bg_code.bg })
+
 	-- Request code range information from the LSP server on buffer changes
 	local debounce_timer = vim.loop.new_timer()
-	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "WinResized", "VimResized" }, {
 		group = vim.api.nvim_create_augroup("LspStyleGroup", { clear = true }),
 		buffer = bufnr,
 		callback = function()

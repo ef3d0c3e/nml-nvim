@@ -98,6 +98,24 @@ function M.process_token(bufnr, range, token_type, token_params)
 			conceal = "▌",
 			hl_group = string.format("NML_Block_%s", token_params.name)
 		})
+	elseif token_type == "code" then
+		if token_params.name ~= "" then
+			vim.api.nvim_buf_set_extmark(bufnr, M.conceal_ns, range.start.line, range.start.character, {
+				end_line = range["end"].line,
+				end_col = range["end"].character,
+				conceal = "",
+				virt_text = { { string.format(" %s ", token_params.language), "NML_Code_Lang" }, { " ", "NML_Code" }, { string.format(" %s ", token_params.name), "NML_Code_Name" } },
+				virt_text_pos = 'inline',
+			})
+		else
+			vim.api.nvim_buf_set_extmark(bufnr, M.conceal_ns, range.start.line, range.start.character, {
+				end_line = range["end"].line,
+				end_col = range["end"].character,
+				conceal = "",
+				virt_text = { { string.format(" %s ", token_params.language), "NML_Code_Lang" } },
+				virt_text_pos = 'inline',
+			})
+		end
 	end
 end
 
@@ -157,6 +175,9 @@ function M.setup(client, bufnr)
 	vim.api.nvim_set_hl(0, "NML_Block_Todo", { fg = '#1ac8a4' })
 	vim.api.nvim_set_hl(0, "NML_Block_Caution", { fg = '#e54f4f' })
 	vim.api.nvim_set_hl(0, "NML_Block_Tip", { fg = '#c0ffcc' })
+
+	vim.api.nvim_set_hl(0, "NML_Code_Lang", { bg = "#2f2f34" })
+	vim.api.nvim_set_hl(0, "NML_Code_Name", { bg = "#2f2f34", fg = '#c0ffcc' })
 
 	-- Request conceal information from the LSP server on buffer changes
 	local debounce_timer = vim.loop.new_timer()

@@ -16,9 +16,9 @@ function M.setup_lsp()
 
 	lspconfig.nmlls.setup {
 		on_attach = function(client, bufnr)
+			require("nml-nvim.code").setup(client, bufnr)
 			require("nml-nvim.conceal").setup(client, bufnr)
 			require("nml-nvim.style").setup(client, bufnr)
-			require("nml-nvim.code").setup(client, bufnr)
 		end
 	}
 end
