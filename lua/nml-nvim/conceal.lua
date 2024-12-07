@@ -77,6 +77,7 @@ function M.process_token(bufnr, range, token_type, token_params)
 		})
 	elseif token_type == "block_name" then
 		local icons = {
+			["Quote"] = "",
 			["Warning"] = "",
 			["Note"] = "󰹕",
 			["Todo"] = "󱦺",
@@ -139,7 +140,6 @@ function M.update_conceal(client, bufnr)
 		local cursor = vim.api.nvim_win_get_cursor(0)
 		local current_line = cursor[1] - 1
 		handle_hover(bufnr, current_line)
-
 	end, bufnr)
 end
 
@@ -151,19 +151,29 @@ function M.setup(client, bufnr)
 	vim.api.nvim_set_hl(0, "NML_Bullet_2", { fg = '#d5b9b2' })
 	vim.api.nvim_set_hl(0, "NML_Bullet_3", { fg = '#a26769' })
 
-	vim.api.nvim_set_hl(0, "NML_Block_Warning", { fg = '#EDBA70' })
-	vim.api.nvim_set_hl(0, "NML_Block_Note", { fg = '#0CC4E3' })
-	vim.api.nvim_set_hl(0, "NML_Block_Todo", { fg = '#1AC8A4' })
-	vim.api.nvim_set_hl(0, "NML_Block_Caution", { fg = '#E54F4F' })
-	vim.api.nvim_set_hl(0, "NML_Block_Tip", { fg = '#C0FFCC' })
+	vim.api.nvim_set_hl(0, "NML_Block_Quote", { fg = '#7dca70' })
+	vim.api.nvim_set_hl(0, "NML_Block_Warning", { fg = '#edba70' })
+	vim.api.nvim_set_hl(0, "NML_Block_Note", { fg = '#0cc4e3' })
+	vim.api.nvim_set_hl(0, "NML_Block_Todo", { fg = '#1ac8a4' })
+	vim.api.nvim_set_hl(0, "NML_Block_Caution", { fg = '#e54f4f' })
+	vim.api.nvim_set_hl(0, "NML_Block_Tip", { fg = '#c0ffcc' })
 
 	-- Request conceal information from the LSP server on buffer changes
+	local debounce_timer = vim.loop.new_timer()
 	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
 		group = vim.api.nvim_create_augroup("LspConcealGroup", { clear = true }),
 		buffer = bufnr,
 		callback = function()
-			vim.schedule(function()
-				M.update_conceal(client, bufnr)
+			-- Throttle updates
+			if debounce_timer:is_active() then
+				debounce_timer:stop()
+			end
+
+			debounce_timer:start(500, 0, function()
+				vim.schedule(function()
+					-- Request updated diagnostics
+					M.update_conceal(client, bufnr)
+				end)
 			end)
 		end
 	})

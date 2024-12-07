@@ -56,19 +56,28 @@ function M.setup(client, bufnr)
 	vim.api.nvim_set_hl(0, "NML_Style_Code", { bg = bg_code.bg })
 
 	-- Request style information from the LSP server on buffer changes
-	vim.api.nvim_create_autocmd({"TextChanged", "TextChangedI"}, {
-		group = vim.api.nvim_create_augroup("LspStyleGroup", {clear = true}),
+	local debounce_timer = vim.loop.new_timer()
+	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+		group = vim.api.nvim_create_augroup("LspStyleGroup", { clear = true }),
 		buffer = bufnr,
 		callback = function()
-			vim.schedule(function()
-				require("nml-nvim.style").update_style(client, bufnr)
+			-- Throttle updates
+			if debounce_timer:is_active() then
+				debounce_timer:stop()
+			end
+
+			debounce_timer:start(500, 0, function()
+				vim.schedule(function()
+					M.update_style(client, bufnr)
+				end)
+
 			end)
 		end
 	})
 
 	-- Trigger once
 	vim.schedule(function()
-		require("nml-nvim.style").update_style(client, bufnr)
+		M.update_style(client, bufnr)
 	end)
 end
 
