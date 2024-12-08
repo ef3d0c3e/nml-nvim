@@ -1,4 +1,5 @@
 local M = {}
+local util = require("nml-nvim.util")
 
 -- TODO: Handle selections properly
 M.conceal_ns = vim.api.nvim_create_namespace("lsp_conceal")
@@ -99,12 +100,23 @@ function M.process_token(bufnr, range, token_type, token_params)
 			hl_group = string.format("NML_Block_%s", token_params.name)
 		})
 	elseif token_type == "code" then
+		local icon = nil
+		local result = util.get_lang_icon(token_params.language)
+		if result == nil then
+			icon = { " " .. token_params.language .. " ", "NML_Code_Lang" }
+		else
+			local syn_name = "NML_Code_Lang_" .. util.get_syntax_from_language(token_params.language);
+			vim.api.nvim_set_hl(0, syn_name,
+				{ fg = result[2], bg = vim.api.nvim_get_hl(0, { name = "NML_Code_Lang" }).bg })
+			icon = { result[1] .. " ", syn_name }
+		end
+
 		if token_params.name ~= "" then
 			vim.api.nvim_buf_set_extmark(bufnr, M.conceal_ns, range.start.line, range.start.character, {
 				end_line = range["end"].line,
 				end_col = range["end"].character,
 				conceal = "",
-				virt_text = { { string.format(" %s ", token_params.language), "NML_Code_Lang" }, { " ", "NML_Code" }, { string.format(" %s ", token_params.name), "NML_Code_Name" } },
+				virt_text = { icon, { " ", "NML_Code" }, { string.format(" %s ", token_params.name), "NML_Code_Name" } },
 				virt_text_pos = 'inline',
 			})
 		else
@@ -112,7 +124,7 @@ function M.process_token(bufnr, range, token_type, token_params)
 				end_line = range["end"].line,
 				end_col = range["end"].character,
 				conceal = "",
-				virt_text = { { string.format(" %s ", token_params.language), "NML_Code_Lang" } },
+				virt_text = { icon },
 				virt_text_pos = 'inline',
 			})
 		end
