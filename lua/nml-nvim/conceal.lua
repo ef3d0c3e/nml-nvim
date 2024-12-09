@@ -128,6 +128,19 @@ function M.process_token(bufnr, range, token_type, token_params)
 				virt_text_pos = 'inline',
 			})
 		end
+	elseif token_type == "checkbox" then
+		local icons = {
+			["Unchecked"] = "󰄱",
+			["Partial"] = "󰄱",
+			["Checked"] = "󰄵",
+		}
+		vim.api.nvim_buf_set_extmark(bufnr, M.conceal_ns, range.start.line, range.start.character, {
+			end_line = range["end"].line,
+			end_col = range["end"].character,
+			virt_text = { { icons[token_params.state], "NML_Checkbox_" .. token_params.state }, { " ", "Normal" } },
+			virt_text_pos = 'inline',
+			conceal = "",
+		})
 	end
 end
 
@@ -190,6 +203,10 @@ function M.setup(client, bufnr)
 
 	vim.api.nvim_set_hl(0, "NML_Code_Lang", { bg = "#2f2f34" })
 	vim.api.nvim_set_hl(0, "NML_Code_Name", { bg = "#2f2f34", fg = '#c0ffcc' })
+
+	vim.api.nvim_set_hl(0, "NML_Checkbox_Unchecked", { fg = '#4f4f4f' })
+	vim.api.nvim_set_hl(0, "NML_Checkbox_Partial", { fg = '#Af6f2f' })
+	vim.api.nvim_set_hl(0, "NML_Checkbox_Checked", { fg = '#4f9f4f' })
 
 	-- Request conceal information from the LSP server on buffer changes
 	local debounce_timer = vim.loop.new_timer()
