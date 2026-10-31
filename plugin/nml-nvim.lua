@@ -20,3 +20,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 vim.api.nvim_create_user_command("NmlIncludeContext", function()
 	require("nml-nvim.include").choose(vim.api.nvim_get_current_buf())
 end, { desc = "Choose the file an included NML file is analysed in" })
+
+vim.api.nvim_create_user_command("NmlPreview", function()
+	require("nml-nvim.preview").open(vim.api.nvim_get_current_buf())
+end, { desc = "Preview the NML page in the browser, live" })

@@ -7,9 +7,10 @@ local M = {}
 ---@field conceal? boolean Draw markers, bullets, checkboxes, quotes and code headers (default true).
 ---@field style? boolean Highlight emphasis, headings, links and code (default true).
 ---@field code? boolean Highlight code blocks with their language's syntax (default true).
+---@field follow? boolean The live preview follows the cursor (default true).
 
 ---@type nml.Options
-M.options = { lsp = true, conceal = true, style = true, code = true }
+M.options = { lsp = true, conceal = true, style = true, code = true, follow = true }
 
 --- Optional: the extras work without it, for a server registered by other means.
 ---@param opts? nml.Options

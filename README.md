@@ -29,6 +29,7 @@ require("nml-nvim").setup({
 	conceal = true,        -- markers, bullets, checkboxes, quotes and code headers
 	style = true,          -- emphasis, headings, links and code
 	code = true,           -- code blocks in their language's syntax
+	follow = true,         -- the live preview follows the cursor
 })
 ```
 
@@ -82,6 +83,17 @@ These use requests the server adds to the protocol:
 
 `:NmlIncludeContext` picks the file an included file is analysed in, among those that include
 it.
+
+## Live preview
+
+`:NmlPreview` opens the current page in the browser, served by the language server from
+memory: nothing is written. The page follows the buffer as you type, unsaved, and the rest of
+the workspace as files are saved. With `follow`, the page scrolls to the block under the
+cursor.
+
+It runs the `nml.preview` command (the page's URI as argument; it answers the page's URL) and
+sends `nml/cursor` notifications (`TextDocumentPositionParams`) when the cursor moves to
+another line. Other editors can do the same.
 
 ## Highlights
 
