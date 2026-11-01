@@ -32,3 +32,7 @@ end, { desc = "Run the NML `:run` block under the cursor" })
 vim.api.nvim_create_user_command("NmlRunAll", function()
 	require("nml-nvim.run").run_all(vim.api.nvim_get_current_buf())
 end, { desc = "Run the NML `:run` blocks that have not completed" })
+
+vim.api.nvim_create_user_command("NmlRunOutput", function()
+	require("nml-nvim.run").output(vim.api.nvim_get_current_buf())
+end, { desc = "Show what the NML `:run` block under the cursor printed" })

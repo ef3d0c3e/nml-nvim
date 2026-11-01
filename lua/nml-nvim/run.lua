@@ -55,18 +55,93 @@ local function exec(bufnr, command, arguments)
 	end)
 end
 
---- Runs the `:run` block under the cursor, or the last one above it.
+--- The line (from 0) of the `:run` block under the cursor, or of the last one above it.
 ---@param bufnr integer
-function M.run(bufnr)
+---@return integer?
+local function block_line(bufnr)
 	local cursor = vim.api.nvim_win_get_cursor(0)[1]
 	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, cursor, false)
 	for line = #lines, 1, -1 do
 		if lines[line]:match("^:run[%[ ]") or lines[line] == ":run" then
-			exec(bufnr, "nml.run", { vim.uri_from_bufnr(bufnr), line - 1 })
-			return
+			return line - 1
 		end
 	end
 	vim.notify("No `:run` block at or above the cursor", vim.log.levels.WARN)
+end
+
+--- Runs the `:run` block under the cursor, or the last one above it.
+---@param bufnr integer
+function M.run(bufnr)
+	local line = block_line(bufnr)
+	if line then
+		exec(bufnr, "nml.run", { vim.uri_from_bufnr(bufnr), line })
+	end
+end
+
+--- Shows everything a run printed in a split: what `nml.runOutput` answers.
+---@param output table
+local function show(output)
+	local title = "Run"
+	if output.name ~= vim.NIL and output.name then
+		title = title .. " #" .. output.name
+	end
+	local status = output.status
+	if output.duration_ms then
+		local preposition = status == "completed" and "in" or "after"
+		status = string.format("%s %s %d ms", status, preposition, output.duration_ms)
+	end
+	local lines = { string.format("%s with %s: %s", title, output.runner, status) }
+	if output.files and #output.files > 0 then
+		lines[#lines + 1] = "Files: " .. table.concat(output.files, ", ")
+	end
+	for _, stream in ipairs({ "stdout", "stderr" }) do
+		local text = output[stream]
+		if type(text) == "string" and text ~= "" then
+			lines[#lines + 1] = ""
+			lines[#lines + 1] = "── " .. stream .. " ──"
+			vim.list_extend(lines, vim.split(text:gsub("\n$", ""), "\n", { plain = true }))
+		end
+	end
+	local name = "nml://run/" .. (output.name ~= vim.NIL and output.name or "output")
+	local old = vim.fn.bufnr(name)
+	if old ~= -1 then
+		vim.api.nvim_buf_delete(old, { force = true })
+	end
+	vim.cmd("botright new")
+	local buf = vim.api.nvim_get_current_buf()
+	vim.bo[buf].buftype = "nofile"
+	vim.bo[buf].bufhidden = "wipe"
+	vim.bo[buf].swapfile = false
+	vim.api.nvim_buf_set_name(buf, name)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+	vim.bo[buf].modifiable = false
+	vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = buf, desc = "Close the run's output" })
+end
+
+--- Shows what the block under the cursor (or the last one above it) printed.
+---@param bufnr integer
+---@param line? integer The line of its `:run`, from 0.
+function M.output(bufnr, line)
+	line = line or block_line(bufnr)
+	local client = nml_client(bufnr)
+	if not line or not client then
+		return
+	end
+	local command = { title = "Output", command = "nml.runOutput", arguments = { vim.uri_from_bufnr(bufnr), line } }
+	client:exec_cmd(command, { bufnr = bufnr }, function(err, output)
+		if err then
+			vim.notify(err.message, vim.log.levels.ERROR)
+		elseif output.status == "not run" or output.status == "running" then
+			vim.notify("The block has " .. (output.status == "running" and "not finished" or "not run"), vim.log.levels.INFO)
+		else
+			show(output)
+		end
+	end)
+end
+
+-- The `≡ Output` lens: shown in a split here, rather than by opening the files.
+vim.lsp.commands["nml.showRunOutput"] = function(command, ctx)
+	M.output(ctx.bufnr, command.arguments[2])
 end
 
 --- Runs the blocks of the buffer that have not completed.

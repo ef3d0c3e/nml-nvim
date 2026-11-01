@@ -101,7 +101,8 @@ another line. Other editors can do the same.
 The server shows the status of each `:run` block in a code lens above it: completed, failed or
 not run, and how long it took. `:NmlRun` runs the block under the cursor (or the last one above
 it), and `:NmlRunAll` the blocks that have not completed; `vim.lsp.codelens.run()` runs the
-lens on the cursor's line. Hovering the `:run` line shows the result. With `codelens = false`,
+lens on the cursor's line. `:NmlRunOutput`, or the `≡ Output` lens, shows everything the block
+printed in a split (`q` closes it). Hovering the `:run` line shows the result. With `codelens = false`,
 the lenses are not shown.
 
 ## Highlights
