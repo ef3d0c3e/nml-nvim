@@ -70,3 +70,19 @@ vim.api.nvim_create_user_command("NmlAlignTable", function()
 		range = { start = { line, 0 }, ["end"] = { line, 0 } },
 	})
 end, { desc = "Align the NML table under the cursor" })
+
+vim.api.nvim_create_user_command("NmlTangle", function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
+		local provider = client.server_capabilities.executeCommandProvider
+		if provider and vim.tbl_contains(provider.commands or {}, "nml.tangle") then
+			client:exec_cmd({ title = "Tangle", command = "nml.tangle" }, { bufnr = bufnr }, function(err)
+				if err then
+					vim.notify(err.message, vim.log.levels.ERROR)
+				end
+			end)
+			return
+		end
+	end
+	vim.notify("No NML language server for this buffer", vim.log.levels.WARN)
+end, { desc = "Write the NML code blocks with `tangle=path` to their files" })

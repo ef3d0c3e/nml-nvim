@@ -114,6 +114,11 @@ also code actions on a heading's line.
 their column, on the side the separator row aligns them to. `:NmlAlignTable` aligns the table
 under the cursor. Tables with cell options (`[hspan=2]`) are left as written.
 
+## Tangling
+
+`:NmlTangle` writes the code blocks that have `tangle=path` to their files, as `nml tangle`
+does.
+
 ## Symbols
 
 `:NmlSymbols` picks among the workspace's files, what references can point to (headings,
