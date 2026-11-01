@@ -31,6 +31,7 @@ require("nml-nvim").setup({
 	code = true,           -- code blocks in their language's syntax
 	follow = true,         -- the live preview follows the cursor
 	codelens = true,       -- the status of `:run` blocks, in code lenses
+	picker = "auto",       -- `:NmlSymbols`: "snacks", "telescope", "select", or the first installed
 })
 ```
 
@@ -76,7 +77,8 @@ These use requests the server adds to the protocol:
 
 * `textDocument/conceal`: markers to hide (`**`, `[[`, …), and tokens to draw in their place:
   list bullets, checkboxes, the bars and titles of quotes and callouts, and code block headers
-  (with [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons) icons when it is
+  after their fence, which stays visible (with
+  [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons) icons when it is
   installed).
 * `textDocument/style`: ranges to highlight, with `@markup.*` groups.
 * `textDocument/codeRange`: code and its language. Code blocks are highlighted with that
@@ -95,6 +97,18 @@ cursor.
 It runs the `nml.preview` command (the page's URI as argument; it answers the page's URL) and
 sends `nml/cursor` notifications (`TextDocumentPositionParams`) when the cursor moves to
 another line. Other editors can do the same.
+
+## Symbols
+
+`:NmlSymbols` picks among the workspace's files, what references can point to (headings,
+figures, media, tables, listings, anchors) and its exported variables, with a preview, and goes
+to the one picked. `:NmlSymbols references`, `variables` or `files` keeps one sort. It uses
+[snacks.nvim](https://github.com/folke/snacks.nvim) or
+[telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) when one is installed,
+`vim.ui.select` otherwise; `picker` chooses.
+
+They come from the server's `workspace/symbol`, so any picker's LSP workspace symbols list them
+too, such as `Snacks.picker.lsp_workspace_symbols()`.
 
 ## Running code
 

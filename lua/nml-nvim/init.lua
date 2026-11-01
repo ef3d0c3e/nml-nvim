@@ -9,9 +9,10 @@ local M = {}
 ---@field code? boolean Highlight code blocks with their language's syntax (default true).
 ---@field follow? boolean The live preview follows the cursor (default true).
 ---@field codelens? boolean Show the status of `:run` blocks in code lenses (default true).
+---@field picker? "auto"|"snacks"|"telescope"|"select" The picker of `:NmlSymbols` (default "auto": the first installed).
 
 ---@type nml.Options
-M.options = { lsp = true, conceal = true, style = true, code = true, follow = true, codelens = true }
+M.options = { lsp = true, conceal = true, style = true, code = true, follow = true, codelens = true, picker = "auto" }
 
 --- Optional: the extras work without it, for a server registered by other means.
 ---@param opts? nml.Options

@@ -36,3 +36,13 @@ end, { desc = "Run the NML `:run` blocks that have not completed" })
 vim.api.nvim_create_user_command("NmlRunOutput", function()
 	require("nml-nvim.run").output(vim.api.nvim_get_current_buf())
 end, { desc = "Show what the NML `:run` block under the cursor printed" })
+
+vim.api.nvim_create_user_command("NmlSymbols", function(args)
+	require("nml-nvim.symbols").pick(vim.api.nvim_get_current_buf(), args.args)
+end, {
+	nargs = "?",
+	complete = function()
+		return { "all", "references", "variables", "files" }
+	end,
+	desc = "Pick a file, reference target or exported variable of the NML workspace",
+})
