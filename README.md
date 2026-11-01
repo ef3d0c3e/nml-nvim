@@ -108,6 +108,12 @@ heading sections, blocks, lists and comments, open at first.
 `:NmlMoveUp` and `:NmlMoveDown` swap it with the section of its level before or after. They are
 also code actions on a heading's line.
 
+## Tables
+
+`vim.lsp.buf.format()` aligns the tables of the buffer, and only them: cells are padded to
+their column, on the side the separator row aligns them to. `:NmlAlignTable` aligns the table
+under the cursor. Tables with cell options (`[hspan=2]`) are left as written.
+
 ## Symbols
 
 `:NmlSymbols` picks among the workspace's files, what references can point to (headings,

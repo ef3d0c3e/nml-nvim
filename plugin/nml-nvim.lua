@@ -62,3 +62,11 @@ end, { desc = "Move the NML section at the cursor above the one before" })
 vim.api.nvim_create_user_command("NmlMoveDown", function()
 	require("nml-nvim.outline").run(vim.api.nvim_get_current_buf(), "nml.moveDown")
 end, { desc = "Move the NML section at the cursor below the one after" })
+
+vim.api.nvim_create_user_command("NmlAlignTable", function()
+	local line = vim.api.nvim_win_get_cursor(0)[1]
+	vim.lsp.buf.format({
+		name = "nml",
+		range = { start = { line, 0 }, ["end"] = { line, 0 } },
+	})
+end, { desc = "Align the NML table under the cursor" })
