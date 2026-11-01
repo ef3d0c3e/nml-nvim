@@ -131,6 +131,17 @@ to the one picked. `:NmlSymbols references`, `variables` or `files` keeps one so
 They come from the server's `workspace/symbol`, so any picker's LSP workspace symbols list them
 too, such as `Snacks.picker.lsp_workspace_symbols()`.
 
+## Agenda
+
+`:NmlAgenda` lists the tasks of the workspace (list items with a checkbox, headings with a
+state such as `TODO`) by date: overdue, today, the next 7 days, later, and undated. A task's
+date is the earliest of its `DEADLINE <…>`, `SCHEDULED <…>` and `<…>` timestamps.
+`:NmlAgenda all` lists done tasks too. In the agenda, `<CR>` goes to a task, `t` toggles it
+(a checkbox, or a heading's state), `r` refreshes and `q` closes.
+
+It shows the server's `nml/agenda` request, and toggles with the `nml.toggleTask` command
+(`[uri, line]`), also a code action on a checkbox's line.
+
 ## Running code
 
 The server shows the status of each `:run` block in a code lens above it: completed, failed or

@@ -86,3 +86,13 @@ vim.api.nvim_create_user_command("NmlTangle", function()
 	end
 	vim.notify("No NML language server for this buffer", vim.log.levels.WARN)
 end, { desc = "Write the NML code blocks with `tangle=path` to their files" })
+
+vim.api.nvim_create_user_command("NmlAgenda", function(args)
+	require("nml-nvim.agenda").open(args.args == "all")
+end, {
+	nargs = "?",
+	complete = function()
+		return { "all" }
+	end,
+	desc = "The agenda of the NML workspace: its tasks by date (`all`: done ones too)",
+})
