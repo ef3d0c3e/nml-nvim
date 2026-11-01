@@ -24,3 +24,11 @@ end, { desc = "Choose the file an included NML file is analysed in" })
 vim.api.nvim_create_user_command("NmlPreview", function()
 	require("nml-nvim.preview").open(vim.api.nvim_get_current_buf())
 end, { desc = "Preview the NML page in the browser, live" })
+
+vim.api.nvim_create_user_command("NmlRun", function()
+	require("nml-nvim.run").run(vim.api.nvim_get_current_buf())
+end, { desc = "Run the NML `:run` block under the cursor" })
+
+vim.api.nvim_create_user_command("NmlRunAll", function()
+	require("nml-nvim.run").run_all(vim.api.nvim_get_current_buf())
+end, { desc = "Run the NML `:run` blocks that have not completed" })

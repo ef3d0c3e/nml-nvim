@@ -30,6 +30,7 @@ require("nml-nvim").setup({
 	style = true,          -- emphasis, headings, links and code
 	code = true,           -- code blocks in their language's syntax
 	follow = true,         -- the live preview follows the cursor
+	codelens = true,       -- the status of `:run` blocks, in code lenses
 })
 ```
 
@@ -94,6 +95,14 @@ cursor.
 It runs the `nml.preview` command (the page's URI as argument; it answers the page's URL) and
 sends `nml/cursor` notifications (`TextDocumentPositionParams`) when the cursor moves to
 another line. Other editors can do the same.
+
+## Running code
+
+The server shows the status of each `:run` block in a code lens above it: completed, failed or
+not run, and how long it took. `:NmlRun` runs the block under the cursor (or the last one above
+it), and `:NmlRunAll` the blocks that have not completed; `vim.lsp.codelens.run()` runs the
+lens on the cursor's line. Hovering the `:run` line shows the result. With `codelens = false`,
+the lenses are not shown.
 
 ## Highlights
 
