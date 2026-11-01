@@ -9,10 +9,11 @@ local M = {}
 ---@field code? boolean Highlight code blocks with their language's syntax (default true).
 ---@field follow? boolean The live preview follows the cursor (default true).
 ---@field codelens? boolean Show the status of `:run` blocks in code lenses (default true).
+---@field fold? boolean Fold with the server's ranges: sections, blocks, lists (default true).
 ---@field picker? "auto"|"snacks"|"telescope"|"select" The picker of `:NmlSymbols` (default "auto": the first installed).
 
 ---@type nml.Options
-M.options = { lsp = true, conceal = true, style = true, code = true, follow = true, codelens = true, picker = "auto" }
+M.options = { lsp = true, conceal = true, style = true, code = true, follow = true, codelens = true, fold = true, picker = "auto" }
 
 --- Optional: the extras work without it, for a server registered by other means.
 ---@param opts? nml.Options
@@ -61,6 +62,9 @@ function M.attach(client, bufnr)
 	end
 	require("nml-nvim.util").on_change(client, bufnr, update)
 	update()
+	if M.options.fold then
+		require("nml-nvim.outline").setup(bufnr)
+	end
 	if M.options.codelens then
 		require("nml-nvim.run").setup(client, bufnr)
 	end

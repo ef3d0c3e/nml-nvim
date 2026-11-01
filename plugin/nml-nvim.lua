@@ -46,3 +46,19 @@ end, {
 	end,
 	desc = "Pick a file, reference target or exported variable of the NML workspace",
 })
+
+vim.api.nvim_create_user_command("NmlPromote", function()
+	require("nml-nvim.outline").run(vim.api.nvim_get_current_buf(), "nml.promote")
+end, { desc = "Promote the NML section at the cursor: its headings go up a level" })
+
+vim.api.nvim_create_user_command("NmlDemote", function()
+	require("nml-nvim.outline").run(vim.api.nvim_get_current_buf(), "nml.demote")
+end, { desc = "Demote the NML section at the cursor: its headings go down a level" })
+
+vim.api.nvim_create_user_command("NmlMoveUp", function()
+	require("nml-nvim.outline").run(vim.api.nvim_get_current_buf(), "nml.moveUp")
+end, { desc = "Move the NML section at the cursor above the one before" })
+
+vim.api.nvim_create_user_command("NmlMoveDown", function()
+	require("nml-nvim.outline").run(vim.api.nvim_get_current_buf(), "nml.moveDown")
+end, { desc = "Move the NML section at the cursor below the one after" })

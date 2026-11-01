@@ -31,6 +31,7 @@ require("nml-nvim").setup({
 	code = true,           -- code blocks in their language's syntax
 	follow = true,         -- the live preview follows the cursor
 	codelens = true,       -- the status of `:run` blocks, in code lenses
+	fold = true,           -- fold sections, blocks and lists with the server's ranges
 	picker = "auto",       -- `:NmlSymbols`: "snacks", "telescope", "select", or the first installed
 })
 ```
@@ -97,6 +98,15 @@ cursor.
 It runs the `nml.preview` command (the page's URI as argument; it answers the page's URL) and
 sends `nml/cursor` notifications (`TextDocumentPositionParams`) when the cursor moves to
 another line. Other editors can do the same.
+
+## Outline
+
+With `fold`, windows fold with the server's ranges (`foldmethod=expr`, `vim.lsp.foldexpr()`):
+heading sections, blocks, lists and comments, open at first.
+
+`:NmlPromote` and `:NmlDemote` change the level of every heading of the section at the cursor;
+`:NmlMoveUp` and `:NmlMoveDown` swap it with the section of its level before or after. They are
+also code actions on a heading's line.
 
 ## Symbols
 
