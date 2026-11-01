@@ -1,5 +1,5 @@
 -- `textDocument/conceal`: markers to hide, and tokens drawn in their place (bullets,
--- checkboxes, quotes and callouts, code block headers). The cursor's line is shown as
+-- checkboxes, quotes and callouts, code block headers after their fence). The cursor's line is shown as
 -- written. Concealing needs `conceallevel` 2 in the window.
 local util = require("nml-nvim.util")
 
@@ -26,9 +26,10 @@ local checkbox_icons = {
 	Checked = "󰄵",
 }
 
+--- The header of a code block, after its fence: its language's icon and name.
 local function code_icon(language)
 	if language == "" then
-		return { " ", "NML_Code_Lang" }
+		return nil
 	end
 	local icon = util.get_lang_icon(language)
 	if icon == nil then
@@ -36,7 +37,7 @@ local function code_icon(language)
 	end
 	local group = "NML_Code_Lang_" .. util.get_syntax_from_language(language):gsub("[^%w]", "_")
 	vim.api.nvim_set_hl(0, group, { fg = icon[2], bg = vim.api.nvim_get_hl(0, { name = "NML_Code_Lang", link = false }).bg })
-	return { icon[1] .. " ", group }
+	return { " " .. icon[1] .. " " .. language .. " ", group }
 end
 
 --- The extmark options of a token.
@@ -62,6 +63,7 @@ local function token_options(token, params)
 			virt_text_pos = "inline",
 		}
 	elseif token == "code" then
+		-- The fences stay; what follows the opening one is drawn as a header.
 		local text = { code_icon(params.language) }
 		if params.name ~= "" then
 			text[#text + 1] = { " ", "NML_Code" }
